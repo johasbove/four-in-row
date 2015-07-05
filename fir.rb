@@ -78,7 +78,8 @@ def green(text); colorize(text, 32); end
 
 def imprimirMatrizColoreada(matrizActual,metodo,dim1,dim2,k,p)
 	puts "\n Felicitaciones!! Eres un genio!!"
-	notcolore = false
+	puts "i #{k} j #{p}"
+	colore = false
 	for i in 0..dim1
 		for j in 0..(dim2-1)
 			if (i==0)
@@ -89,26 +90,49 @@ def imprimirMatrizColoreada(matrizActual,metodo,dim1,dim2,k,p)
 				else
 					if (metodo == 1)
 						for w in 0..3
-							notcolore = notcolore || (i != k-w && j != p)
+							colore = colore || (i == k+1-w && j == p)
 						end
-						if (!notcolore)
+						if (colore)
 							print " [ " + green(matrizActual[i-1][j]) + " ] "
-						elsif (notcolore)
+						elsif (!colore)
 							print " [ #{matrizActual[i-1][j]} ] "
 						end
-						notcolore = false
+						colore = false
 					elsif (metodo == 2)
 						for w in 0..3
-							notcolore = notcolore || (j != p-w && i != k+1)
+							colore = colore || (j == p-w && i == k+1)
 						end
-						if (!notcolore)
+						if (colore)
 							print " [ " + green(matrizActual[i-1][j]) + " ] "
-						elsif (notcolore)
+						elsif (!colore)
 							print " [ #{matrizActual[i-1][j]} ] "
 						end
-						notcolore = false
+						colore = false
+					elsif (metodo == 3)
+						for w in 0..3
+							colore = colore || (i == k+1+w && j == p-w)
+						end
+						if (colore)
+							print " [ " + green(matrizActual[i-1][j]) + " ] "
+						elsif (!colore)
+							print " [ #{matrizActual[i-1][j]} ] "
+						end
+						colore = false
+					elsif (metodo == 4)
+						for w in 0..3
+							colore = colore || (i == k+1-w && j == p-w)
+						end
+						if (colore)
+							print " [ " + green(matrizActual[i-1][j]) + " ] "
+						elsif (!colore)
+							print " [ #{matrizActual[i-1][j]} ] "
+						end
+						colore = false
 					end
+
+					
 				end
+				
 			end
 		end
 		print "\n"
@@ -189,146 +213,100 @@ def recorrerFilas(matrizActual,dim1,dim2,numfichas,col)
 	return habemusvictor
 end
 
-def recorrerDiagonalNeg(matrizActual,dim1,dim2)
+def recorrerDiagonalNeg(matrizActual,dim1,dim2,numfichas,col)
 	contiguas1 = 0
 	contiguas2 = 0
 	habemusvictor = false
 	jugador = 3
 	metodo = 4
-	for j in 0..(dim1-4)
-		i=0
-		while (i+j < dim1)
-			if (matrizActual[i][i+j] == "*")
-				contiguas1 += 1
-				contiguas2 = 0
-			elsif (matrizActual[i][i+j] == "@")
-				contiguas2 += 1
-				contiguas1 = 0
-			else
-				contiguas1 = 0
-				contiguas2 =0
-			end
-			if (contiguas1 == 4)
-				jugador = 1
-				puts "Jugador ganador #{jugador}"
-				habemusvictor = true
-				return habemusvictor
-			elsif (contiguas2 == 4)
-				jugador = 2
-				puts "Jugador ganador #{jugador}"
-				habemusvictor = true
-				return habemusvictor
-			end	
-
-			i += 1
+	aux = 0
+	k = 0
+	filas = dim1 - numfichas[col-1]
+	ifinal = filas
+	jfinal = col-1
+	while ((ifinal+aux < dim1) && (jfinal+aux < dim2) && matrizActual[ifinal+aux][jfinal+aux] != 0)
+		ifinal = ifinal + aux
+		jfinal = jfinal + aux
+		aux = 1
+	end
+	while ((ifinal-k >= 0) && (jfinal-k >= 0))
+		if (matrizActual[ifinal-k][jfinal-k] == "*")
+			contiguas1 += 1
+			contiguas2 = 0
+		elsif (matrizActual[ifinal-k][jfinal-k] == "@")
+			contiguas2 += 1
+			contiguas1 = 0
+		elsif (matrizActual[ifinal-k][jfinal-k] != "@" && matrizActual[ifinal-k][jfinal-k] != "*")
+			contiguas1 = 0
+			contiguas2 =0
 		end
-		if (j!=0)
-			i=0
-			while (i+j < dim1)
-				if (matrizActual[i+j][i] == "*")
-					contiguas1 += 1
-					contiguas2 = 0
-				elsif (matrizActual[i+j][i] == "@")
-					contiguas2 += 1
-					contiguas1 = 0
-				else
-					contiguas1 = 0
-					contiguas2 =0
-				end
-				if (contiguas1 == 4)
-					jugador = 1
-					puts "Jugador ganador #{jugador}"
-					habemusvictor = true
-					return habemusvictor
-				elsif (contiguas2 == 4)
-					jugador = 2
-					puts "Jugador ganador #{jugador}"
-					habemusvictor = true
-					return habemusvictor
-				end	
-
-				i += 1
-			end
-		end
-		contiguas1 = 0
-		contiguas2 = 0
+		if (contiguas1 == 4)
+			imprimirMatrizColoreada(matrizActual,metodo,dim1,dim2,ifinal,jfinal)
+			jugador = 1
+			puts "Jugador ganador #{jugador}"
+			habemusvictor = true
+			return habemusvictor
+		elsif (contiguas2 == 4)
+			imprimirMatrizColoreada(matrizActual,metodo,dim1,dim2,ifinal,jfinal)
+			jugador = 2
+			puts "Jugador ganador #{jugador}"
+			habemusvictor = true
+			return habemusvictor
+		end	
+		k += 1
 	end
 	return habemusvictor
 end
 
 
-def recorrerDiagonalPos(matrizActual,dim1,dim2)
+def recorrerDiagonalPos(matrizActual,dim1,dim2,numfichas,col)
 	contiguas1 = 0
 	contiguas2 = 0
 	habemusvictor = false
 	jugador = 3
 	metodo = 3
-	for i in 3..(dim1-1)
-		for j in 0..i
-			if (matrizActual[i-j][j] == "*")
-				contiguas1 += 1
-				contiguas2 = 0
-			elsif (matrizActual[i-j][j] == "@")
-				contiguas2 += 1
-				contiguas1 = 0
-			else
-				contiguas1 = 0
-				contiguas2 =0
-			end
-			if (contiguas1 == 4)
-				jugador = 1
-				puts "Jugador ganador #{jugador}"
-				habemusvictor = true
-				return habemusvictor
-			elsif (contiguas2 == 4)
-				jugador = 2
-				puts "Jugador ganador #{jugador}"
-				habemusvictor = true
-				return habemusvictor
-			end	
+	aux = 0
+	k = 0
+	filas = dim1 - numfichas[col-1]
+	ifinal = filas
+	jfinal = col-1
+	while ((ifinal-aux >= 0) && (jfinal+aux < dim2) && matrizActual[ifinal-aux][jfinal+aux] != 0)
+		ifinal = ifinal - aux
+		jfinal = jfinal + aux
+		aux = 1
+	end
+	while ((ifinal+k < dim1) && (jfinal-k >= 0))
+		if (matrizActual[ifinal+k][jfinal-k] == "*")
+			contiguas1 += 1
+			contiguas2 = 0
+		elsif (matrizActual[ifinal+k][jfinal-k] == "@")
+			contiguas2 += 1
+			contiguas1 = 0
+		elsif (matrizActual[ifinal+k][jfinal-k] != "@" && matrizActual[ifinal-k][jfinal-k] != "*")
+			contiguas1 = 0
+			contiguas2 =0
 		end
-
-		if (i == dim1-1)
-			n = 0
-			k = 1
-			while (k <= (dim2-4))
-				while ((n+1)<dim1 && (n+k)<dim2)
-					if (matrizActual[i-n][n+k] == "*")
-						contiguas1 += 1
-						contiguas2 = 0
-					elsif (matrizActual[i-n][n+k] == "@")
-						contiguas2 += 1
-						contiguas1 = 0
-					else
-						contiguas1 = 0
-						contiguas2 =0
-					end
-					if (contiguas1 == 4)
-						jugador = 1
-						puts "Jugador ganador #{jugador}"
-						habemusvictor = true
-						return habemusvictor
-					elsif (contiguas2 == 4)
-						jugador = 2
-						puts "Jugador ganador #{jugador}"
-						habemusvictor = true
-						return habemusvictor
-					end	
-					n += 1
-				end
-				n = 0
-				k += 1
-			end 
-		end
-		contiguas1 = 0
-		contiguas2 = 0
+		if (contiguas1 == 4)
+			imprimirMatrizColoreada(matrizActual,metodo,dim1,dim2,ifinal,jfinal)
+			jugador = 1
+			puts "Jugador ganador #{jugador}"
+			habemusvictor = true
+			return habemusvictor
+		elsif (contiguas2 == 4)
+			imprimirMatrizColoreada(matrizActual,metodo,dim1,dim2,ifinal,jfinal)
+			jugador = 2
+			puts "Jugador ganador #{jugador}"
+			habemusvictor = true
+			return habemusvictor
+		end	
+		k += 1
 	end
 	return habemusvictor
 end
 
 def verificarGanador(matrizActual,dim1,dim2,col,numfichas)
 	habemusvictor = recorrerFilas(matrizActual,dim1,dim2,numfichas,col) || recorrerCol(matrizActual,dim1,dim2,col) ||
-					recorrerDiagonalNeg(matrizActual,dim1,dim2) || recorrerDiagonalPos(matrizActual,dim1,dim2)
+					recorrerDiagonalNeg(matrizActual,dim1,dim2,numfichas,col) || recorrerDiagonalPos(matrizActual,dim1,dim2,numfichas,col)
 	return habemusvictor
 end
 
